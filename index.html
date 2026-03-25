@@ -484,7 +484,7 @@ function playFired(){
 }
 function startAmbient(){
   if(!audioCtx||ambientNode)return;
-  const master=audioCtx.createGain();master.gain.value=0.12;master.connect(audioCtx.destination);
+  const master=audioCtx.createGain();master.gain.value=0.50;master.connect(audioCtx.destination);
   const nodes=[];
   // 1) Deep pulsing bass drone — heartbeat of stress
   const bass=audioCtx.createOscillator(),bassG=audioCtx.createGain(),bassF=audioCtx.createBiquadFilter();
@@ -540,7 +540,7 @@ function startAmbient(){
     // Intensity ramp: call this from game loop
     setIntensity(t){
       // t: 0-1 (start to end of game)
-      master.gain.value=0.10+t*0.10;
+      master.gain.value=0.50+t*0.30;
       lfo.frequency.value=1.8+t*1.5; // heartbeat speeds up
       bassG.gain.value=0.25+t*0.15;
       strG.gain.value=0.04+t*0.06; // dissonance grows
