@@ -7,56 +7,48 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg-deep: #06080c;
-  --bg-panel: #0c1018;
-  --bg-card: #111824;
-  --border: #1c2840;
-  --border-glow: #2a3f6a;
-  --gold: #d4a843;
-  --gold-dim: #8a6f2a;
-  --red: #e63946;
-  --red-glow: #ff1a2e;
-  --red-dim: #6b1520;
-  --green: #2ec486;
-  --green-glow: #00ff88;
-  --green-dim: #0f4a2f;
-  --text: #c8d0e0;
-  --text-dim: #5a6580;
-  --text-muted: #3a4560;
-  --headline-bg: rgba(6,8,12,.97);
-  --ticker-bg: linear-gradient(90deg, #1a0008 0%, #200010 50%, #1a0008 100%);
-}
+:root{--bg-deep:#06080c;--bg-panel:#0c1018;--bg-card:#111824;--border:#1c2840;--border-glow:#2a3f6a;--gold:#d4a843;--gold-dim:#8a6f2a;--red:#e63946;--red-glow:#ff1a2e;--red-dim:#6b1520;--green:#2ec486;--green-glow:#00ff88;--green-dim:#0f4a2f;--text:#c8d0e0;--text-dim:#5a6580;--text-muted:#3a4560;--headline-bg:rgba(6,8,12,.97);--ticker-bg:linear-gradient(90deg,#1a0008 0%,#200010 50%,#1a0008 100%);--vignette-color:rgba(0,0,0,.6)}
 *{margin:0;padding:0;box-sizing:border-box}
 @keyframes flashRed{0%{box-shadow:inset 0 0 80px rgba(230,57,70,.15)}50%{box-shadow:inset 0 0 120px rgba(230,57,70,.35)}100%{box-shadow:inset 0 0 80px rgba(230,57,70,.15)}}
 @keyframes flashGreen{0%{box-shadow:inset 0 0 80px rgba(46,196,134,.1)}50%{box-shadow:inset 0 0 120px rgba(46,196,134,.3)}100%{box-shadow:inset 0 0 80px rgba(46,196,134,.1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-3px)}20%,40%,60%,80%{transform:translateX(3px)}}
+@keyframes shake{0%,100%{transform:translateX(0) rotate(0)}10%,50%,90%{transform:translateX(-3px) rotate(-.3deg)}30%,70%{transform:translateX(3px) rotate(.3deg)}}
+@keyframes shakeHard{0%,100%{transform:translateX(0) rotate(0)}10%,50%,90%{transform:translateX(-6px) rotate(-.6deg)}30%,70%{transform:translateX(6px) rotate(.6deg)}}
 @keyframes slideDown{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes explode{0%{transform:scale(1);opacity:1;filter:blur(0)}50%{transform:scale(2);opacity:.7;filter:blur(2px)}100%{transform:scale(4);opacity:0;filter:blur(8px)}}
 @keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes urgentPulse{0%,100%{background:var(--red)}50%{background:#ff2040}}
-@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes glowPulse{0%,100%{text-shadow:0 0 20px currentColor}50%{text-shadow:0 0 40px currentColor,0 0 80px currentColor}}
 @keyframes countPop{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
 @keyframes streakFire{0%,100%{color:var(--gold);text-shadow:0 0 10px var(--gold)}50%{color:#ff6600;text-shadow:0 0 20px #ff6600}}
+@keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
+@keyframes countdownPulse{0%,100%{opacity:.7;transform:scaleX(1)}50%{opacity:1;transform:scaleX(1.02)}}
+@keyframes glitchSlice{0%{clip-path:inset(0 0 100% 0)}100%{clip-path:inset(100% 0 0 0)}}
 
 body{background:var(--bg-deep);color:var(--text);font-family:'JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column;position:relative}
-body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:999}
+#scanlines{position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:999;transition:opacity .5s}
+#vignette{position:fixed;top:0;left:0;right:0;bottom:0;box-shadow:inset 0 0 150px var(--vignette-color);pointer-events:none;z-index:998;transition:box-shadow .3s}
 .screen-flash-red{animation:flashRed .4s ease}
 .screen-flash-green{animation:flashGreen .4s ease}
 .shake{animation:shake .35s ease}
+.shake-hard{animation:shakeHard .5s ease}
+.glitch{position:relative}
+.glitch::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(transparent 0%,rgba(230,57,70,.08) 2%,transparent 4%,transparent 96%,rgba(46,196,134,.08) 98%,transparent 100%);animation:glitchSlice .15s steps(4) 2;pointer-events:none}
 
-/* ═══════ TICKER BAR ═══════ */
+/* TICKER */
 #ticker-bar{background:var(--ticker-bg);border-bottom:2px solid var(--red-dim);height:42px;overflow:hidden;position:relative;flex-shrink:0}
 #ticker-bar .label{position:absolute;left:0;top:0;z-index:2;background:var(--red);color:#fff;font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;padding:10px 20px;height:100%;text-transform:uppercase;animation:urgentPulse 2s ease infinite}
 #ticker-content{display:flex;white-space:nowrap;animation:tickerScroll 40s linear infinite;padding-left:140px;line-height:42px;font-size:14px;color:var(--red);letter-spacing:.3px;font-family:'Oswald',sans-serif}
 #ticker-content span{margin-right:80px;opacity:.9}
 #ticker-content span::before{content:'◆ ';color:var(--red-dim)}
 
-/* ═══════ HEADLINE FLASH ═══════ */
-#headline-flash{position:fixed;top:46px;left:0;right:0;z-index:100;background:var(--headline-bg);border-bottom:3px solid var(--red);padding:18px 40px;display:none;animation:slideDown .25s ease;backdrop-filter:blur(8px);display:none}
+/* NEWS COUNTDOWN */
+#news-countdown{position:fixed;top:44px;left:0;right:0;z-index:90;background:rgba(26,0,8,.95);border-bottom:2px solid var(--red);padding:8px 20px;display:none;text-align:center;font-family:'Oswald',sans-serif;font-size:16px;color:var(--red-glow);letter-spacing:3px;animation:countdownPulse .5s ease infinite}
+#news-countdown .countdown-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;margin-left:8px}
+
+/* HEADLINE FLASH */
+#headline-flash{position:fixed;top:46px;left:0;right:0;z-index:100;background:var(--headline-bg);border-bottom:3px solid var(--red);padding:18px 40px;display:none;animation:slideDown .25s ease;backdrop-filter:blur(8px)}
 #headline-flash .flash-inner{display:flex;align-items:center;justify-content:center;gap:24px;max-width:1000px;margin:0 auto}
 #headline-flash .trump-face{flex-shrink:0;width:80px;height:80px}
 #headline-flash .flash-content{text-align:left}
@@ -71,20 +63,18 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
 #headline-flash .impact.down{color:var(--red);animation:pulse .6s ease 3}
 #headline-flash .impact.up{color:var(--green);animation:pulse .6s ease 3}
 
-/* ═══════ MAIN LAYOUT ═══════ */
+/* MAIN LAYOUT */
 #game-container{display:flex;flex-direction:column;flex:1;padding:6px;gap:5px;min-height:0}
 #chart-row{flex:1;display:flex;gap:5px;min-height:0}
-
-/* ═══════ CHART ═══════ */
 #chart-wrap{flex:1;background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;position:relative;overflow:hidden}
-#chart-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-glow),transparent)}
+#chart-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-glow),transparent);z-index:1}
 #chart-wrap canvas{width:100%;height:100%}
 #price-label{position:absolute;right:14px;top:12px;font-size:32px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
 #price-change{position:absolute;right:14px;top:50px;font-size:13px;font-weight:700}
 #difficulty-label{position:absolute;left:14px;top:12px;font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;font-family:'Oswald',sans-serif}
 #time-label{position:absolute;right:14px;top:80px;font-size:22px;color:var(--gold);font-family:'Bebas Neue',sans-serif;letter-spacing:3px}
 
-/* ═══════ SIDE PANEL ═══════ */
+/* SIDE PANEL */
 #side-panel{width:250px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px 14px;position:relative}
 .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-glow),transparent)}
@@ -103,7 +93,7 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
 #trade-log .entry.win{color:var(--green)}
 #trade-log .entry.loss{color:var(--red)}
 
-/* ═══════ CONTROLS ═══════ */
+/* CONTROLS */
 #controls{display:flex;gap:5px;flex-shrink:0;padding:0 0 2px}
 #controls button{flex:1;padding:12px 6px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;border:1px solid;border-radius:6px;cursor:pointer;transition:all .15s;text-transform:uppercase;position:relative;overflow:hidden}
 #controls button::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
@@ -115,22 +105,21 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
 .btn-long:hover{border-color:var(--green)!important;box-shadow:0 0 20px rgba(46,196,134,.15)}
 .btn-short:hover{border-color:var(--red)!important;box-shadow:0 0 20px rgba(230,57,70,.15)}
 .btn-flat:hover{border-color:var(--text-dim)!important}
-#controls button:disabled{opacity:.3;cursor:not-allowed;transform:none!important}
 .key-hint{font-size:9px;display:block;color:var(--text-muted);margin-top:3px;font-family:'JetBrains Mono',monospace;letter-spacing:0}
 
-/* ═══════ STREAK ═══════ */
+/* STREAK */
 #streak-bar{flex-shrink:0;height:30px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:11px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--text-dim)}
 #streak-display{color:var(--gold);font-weight:700;font-size:14px}
 #streak-display.hot{animation:streakFire .4s ease infinite}
 
-/* ═══════ OVERLAYS ═══════ */
+/* OVERLAYS */
 .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(6,8,12,.96);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(4px)}
 .overlay h1{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:8px;margin-bottom:4px}
 .overlay h2{font-family:'Oswald',sans-serif;font-size:18px;font-weight:400;color:var(--text-dim);margin-bottom:32px;text-align:center;max-width:520px;line-height:1.5}
-.overlay .subtitle{font-size:12px;color:var(--text-muted);margin-bottom:24px;letter-spacing:1px}
-.overlay button{padding:16px 56px;font-size:16px;font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(180deg,var(--gold),#a07828);color:var(--bg-deep);border:none;border-radius:6px;cursor:pointer;margin-top:20px;transition:all .2s;box-shadow:0 4px 20px rgba(212,168,67,.2)}
-.overlay button:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(212,168,67,.4);background:linear-gradient(180deg,#e8c050,var(--gold))}
-.overlay button:active{transform:translateY(0)}
+.overlay button{padding:16px 56px;font-size:16px;font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(180deg,var(--gold),#a07828);color:var(--bg-deep);border:none;border-radius:6px;cursor:pointer;margin-top:12px;transition:all .2s;box-shadow:0 4px 20px rgba(212,168,67,.2)}
+.overlay button:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(212,168,67,.4)}
+.overlay button.secondary{background:linear-gradient(180deg,#2a3040,#1a2030);color:var(--text-dim);box-shadow:none;padding:12px 36px;font-size:13px}
+.overlay button.secondary:hover{color:var(--text);box-shadow:0 4px 15px rgba(0,0,0,.3)}
 #start-screen h1{color:var(--gold);animation:glowPulse 3s ease infinite}
 #start-screen .rules{display:flex;gap:20px;margin-bottom:20px}
 #start-screen .rule{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 18px;text-align:center;width:150px}
@@ -138,77 +127,83 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
 #start-screen .rule .desc{font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:1px;text-transform:uppercase}
 #game-over-screen h1{color:var(--red);letter-spacing:6px}
 #game-over-screen.win h1{color:var(--green)}
-.final-stats{text-align:center;margin:16px 0}
+.final-stats{text-align:center;margin:12px 0}
 .final-stats .label-text{font-family:'Oswald',sans-serif;font-size:13px;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase}
-.final-stats .big{font-family:'Bebas Neue',sans-serif;font-size:48px;margin:8px 0;letter-spacing:4px}
+.final-stats .big{font-family:'Bebas Neue',sans-serif;font-size:48px;margin:6px 0;letter-spacing:4px}
 .final-stats .big.positive{color:var(--green);text-shadow:0 0 30px rgba(46,196,134,.3)}
 .final-stats .big.negative{color:var(--red);text-shadow:0 0 30px rgba(230,57,70,.3)}
-.grade{font-family:'Bebas Neue',sans-serif;font-size:80px;margin:8px 0;letter-spacing:6px}
+.grade{font-family:'Bebas Neue',sans-serif;font-size:72px;margin:6px 0;letter-spacing:6px}
 .grade.S{color:var(--gold);text-shadow:0 0 40px rgba(212,168,67,.4)}
-.grade.A{color:var(--green);text-shadow:0 0 40px rgba(46,196,134,.3)}
-.grade.B{color:#4a9eff;text-shadow:0 0 40px rgba(74,158,255,.3)}
+.grade.A{color:var(--green)}
+.grade.B{color:#4a9eff}
 .grade.C{color:var(--gold-dim)}
 .grade.D{color:var(--red)}
 .grade.F{color:var(--red-glow);animation:glowPulse 1s ease infinite}
-#leaderboard{margin-top:16px;font-size:11px;color:var(--text-dim)}
-#leaderboard .lb-title{font-family:'Oswald',sans-serif;letter-spacing:3px;text-transform:uppercase;font-size:10px;margin-bottom:8px}
+#leaderboard{margin-top:10px;font-size:11px;color:var(--text-dim)}
+#leaderboard .lb-title{font-family:'Oswald',sans-serif;letter-spacing:3px;text-transform:uppercase;font-size:10px;margin-bottom:6px}
 #leaderboard table{margin:0 auto;border-collapse:collapse}
-#leaderboard td{padding:3px 14px;font-family:'JetBrains Mono',monospace;font-size:11px}
+#leaderboard td{padding:2px 12px;font-family:'JetBrains Mono',monospace;font-size:11px}
 
-/* ═══════ EXPLOSION ═══════ */
+/* ACHIEVEMENTS ON GAME OVER */
+#go-achievements{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:500px}
+.ach-badge{background:var(--bg-card);border:1px solid var(--gold-dim);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--gold);display:flex;align-items:center;gap:6px}
+.ach-badge .ach-icon{font-size:16px}
+.ach-badge.new{border-color:var(--gold);box-shadow:0 0 12px rgba(212,168,67,.3)}
+
+/* ACHIEVEMENT TOAST */
+#achievement-toasts{position:fixed;top:50px;right:10px;z-index:350;display:flex;flex-direction:column;gap:8px}
+.achievement-toast{background:var(--bg-card);border:2px solid var(--gold);border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:10px;animation:toastIn .4s ease;min-width:250px;box-shadow:0 4px 24px rgba(212,168,67,.2)}
+.achievement-toast.removing{animation:toastOut .3s ease forwards}
+.achievement-toast .toast-icon{font-size:24px}
+.achievement-toast .toast-text{font-family:'Oswald',sans-serif;font-size:13px;color:var(--gold);letter-spacing:1px}
+.achievement-toast .toast-name{font-weight:700;font-size:14px;color:#fff}
+
+/* SHARE CARD */
+#share-card-container{display:none}
+.share-buttons{display:flex;gap:10px;margin-top:10px}
+
 #explosion{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:100px;display:none;z-index:300;pointer-events:none}
 #explosion.active{display:block;animation:explode 1.2s ease forwards}
-
-/* ═══════ COUNTDOWN ═══════ */
 #countdown{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:140px;letter-spacing:10px;color:var(--gold);z-index:250;display:none;text-shadow:0 0 60px rgba(212,168,67,.4);text-align:center}
 #countdown .hype{font-family:'Oswald',sans-serif;font-size:22px;letter-spacing:4px;color:var(--text-dim);margin-bottom:10px;display:block}
-
-/* ═══════ KEYS HINT BAR ═══════ */
 .keys-bar{display:flex;gap:12px;align-items:center;font-size:11px;color:var(--text-muted);margin-bottom:12px}
 .keys-bar kbd{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)}
 </style>
 </head>
 <body>
+<div id="scanlines"></div>
+<div id="vignette"></div>
 
-<!-- TICKER -->
 <div id="ticker-bar">
   <div class="label">ALERT</div>
   <div id="ticker-content"></div>
 </div>
 
-<!-- HEADLINE FLASH -->
+<div id="news-countdown">INCOMING HEADLINE <span class="countdown-num" id="nc-num">5</span></div>
+
 <div id="headline-flash">
   <div class="flash-inner">
     <svg class="trump-face" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <!-- Hair -->
       <ellipse cx="50" cy="28" rx="38" ry="22" fill="#f0c040"/>
       <path d="M12,32 Q20,8 50,12 Q80,8 88,32 Q85,18 70,14 Q55,10 50,16 Q45,10 30,14 Q15,18 12,32Z" fill="#e8b020"/>
       <path d="M18,30 Q25,20 40,22 L35,28Z" fill="#daa520"/>
       <path d="M82,30 Q75,20 60,22 L65,28Z" fill="#daa520"/>
-      <!-- Face -->
       <ellipse cx="50" cy="52" rx="30" ry="32" fill="#f5c5a0"/>
       <ellipse cx="50" cy="55" rx="28" ry="30" fill="#f0b888"/>
-      <!-- Eyes -->
       <ellipse cx="38" cy="46" rx="6" ry="4" fill="#fff"/>
       <ellipse cx="62" cy="46" rx="6" ry="4" fill="#fff"/>
       <circle cx="39" cy="46" r="2.5" fill="#4a7090"/>
       <circle cx="63" cy="46" r="2.5" fill="#4a7090"/>
       <circle cx="39.5" cy="45.5" r="1" fill="#000"/>
       <circle cx="63.5" cy="45.5" r="1" fill="#000"/>
-      <!-- Eyebrows -->
       <path d="M30,40 Q38,35 46,39" stroke="#c08030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       <path d="M54,39 Q62,35 70,40" stroke="#c08030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- Nose -->
       <path d="M48,50 Q46,58 44,60 Q50,62 56,60 Q54,58 52,50" fill="#e8a878"/>
-      <!-- Mouth -->
       <path d="M38,68 Q44,64 50,65 Q56,64 62,68" stroke="#c06040" stroke-width="2" fill="none" stroke-linecap="round"/>
       <path d="M40,68 Q50,73 60,68" fill="#d04030" opacity=".6"/>
-      <!-- Chin -->
       <ellipse cx="50" cy="76" rx="14" ry="6" fill="#e8a878" opacity=".4"/>
-      <!-- Ears -->
       <ellipse cx="20" cy="52" rx="5" ry="8" fill="#f0b888"/>
       <ellipse cx="80" cy="52" rx="5" ry="8" fill="#f0b888"/>
-      <!-- Collar/tie hint -->
       <path d="M35,82 L50,95 L65,82" fill="#e63946" stroke="#c02030" stroke-width="1"/>
       <rect x="42" y="82" width="16" height="6" fill="#fff" rx="1"/>
     </svg>
@@ -221,7 +216,6 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
   </div>
 </div>
 
-<!-- MAIN GAME -->
 <div id="game-container">
   <div id="chart-row">
     <div id="chart-wrap">
@@ -229,7 +223,7 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
       <div id="price-label">5,500.00</div>
       <div id="price-change">+0.00 (0.00%)</div>
       <div id="difficulty-label">DIFFICULTY: EASY ★</div>
-      <div id="time-label">5:00</div>
+      <div id="time-label">0:30</div>
     </div>
     <div id="side-panel">
       <div class="panel">
@@ -265,23 +259,18 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
   </div>
 </div>
 
-<!-- OVERLAYS -->
+<div id="achievement-toasts"></div>
+
 <div class="overlay" id="start-screen">
   <h1>TRADING THE TRUMP TAPE</h1>
-  <h2>Trade S&P 500 futures while battling a relentless barrage of unpredictable headlines. React fast — or get blown out.</h2>
+  <h2>Trade S&P 500 futures while battling unpredictable headlines. React fast — or get blown out.</h2>
   <div class="rules">
     <div class="rule"><div class="num">$50K</div><div class="desc">Starting Capital</div></div>
     <div class="rule"><div class="num">$50</div><div class="desc">Per Point</div></div>
     <div class="rule"><div class="num">0:30</div><div class="desc">Survive</div></div>
   </div>
   <div class="keys-bar">
-    <kbd>1</kbd><kbd>2</kbd> Long
-    <span style="color:var(--text-muted)">·</span>
-    <kbd>3</kbd><kbd>4</kbd> Short
-    <span style="color:var(--text-muted)">·</span>
-    <kbd>SPACE</kbd> Flatten
-    <span style="color:var(--text-muted)">·</span>
-    <kbd>ESC</kbd> Panic
+    <kbd>1</kbd><kbd>2</kbd> Long · <kbd>3</kbd><kbd>4</kbd> Short · <kbd>SPACE</kbd> Flatten · <kbd>ESC</kbd> Panic
   </div>
   <button onclick="startGame()">START TRADING</button>
 </div>
@@ -293,81 +282,117 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
     <div class="big" id="go-pnl">$0</div>
     <div class="grade" id="go-grade">F</div>
   </div>
+  <div id="go-achievements"></div>
   <div id="leaderboard"></div>
-  <button onclick="startGame()">TRADE AGAIN</button>
+  <div class="share-buttons">
+    <button onclick="startGame()">TRADE AGAIN</button>
+    <button class="secondary" onclick="downloadScoreCard()">📸 SHARE SCORE</button>
+  </div>
 </div>
 
 <div id="countdown"></div>
 <div id="explosion">💥</div>
+<canvas id="share-card" width="600" height="400" style="display:none"></canvas>
 
 <script>
-// ============== HEADLINES ==============
+// ═══════ HEADLINES ═══════
 const HEADLINES = [
-  {text:"BREAKING: Trump announces 50% tariffs on ALL European Union imports effective immediately",src:"White House Press Pool",bias:-1,mag:2.0,cat:"tariff"},
+  {text:"BREAKING: Trump announces 50% tariffs on ALL European Union imports",src:"White House Press Pool",bias:-1,mag:2.0,cat:"tariff"},
   {text:"Trump threatens 100% tariff on Chinese EVs: 'They're stealing our jobs!'",src:"Reuters",bias:-1,mag:1.8,cat:"tariff"},
-  {text:"NEW: Universal 25% baseline tariff on all imports being drafted by White House",src:"Bloomberg",bias:-1,mag:2.2,cat:"tariff"},
-  {text:"Trump to impose emergency tariffs on Canadian lumber and steel by Friday",src:"CNBC",bias:-1,mag:1.5,cat:"tariff"},
-  {text:"JUST IN: Trump signs executive order doubling tariffs on semiconductor imports",src:"AP News",bias:-1,mag:1.7,cat:"tariff"},
+  {text:"NEW: Universal 25% baseline tariff on all imports being drafted",src:"Bloomberg",bias:-1,mag:2.2,cat:"tariff"},
+  {text:"Trump to impose emergency tariffs on Canadian lumber and steel",src:"CNBC",bias:-1,mag:1.5,cat:"tariff"},
+  {text:"Trump signs executive order doubling tariffs on semiconductors",src:"AP News",bias:-1,mag:1.7,cat:"tariff"},
   {text:"Trump: 'Mexico will pay a 200% tariff until the wall is finished!'",src:"Truth Social",bias:-1,mag:1.6,cat:"tariff"},
-  {text:"White House confirms reciprocal tariffs on 15 additional countries next week",src:"Wall Street Journal",bias:-1,mag:1.9,cat:"tariff"},
-  {text:"Trump threatens tariffs on allies who trade with China: 'You're with us or against us'",src:"Financial Times",bias:-1,mag:1.8,cat:"tariff"},
-  {text:"BREAKING: Trump announces 'magnificent' trade deal with China — tariffs to be rolled back",src:"White House",bias:1,mag:2.5,cat:"deal"},
-  {text:"Trump: 'Beautiful deal with Japan, biggest trade agreement in history!'",src:"Truth Social",bias:1,mag:1.8,cat:"deal"},
-  {text:"US and EU reach preliminary trade framework — tariff pause extended 90 days",src:"Reuters",bias:1,mag:2.0,cat:"deal"},
-  {text:"Trump announces surprise trade agreement with India at Mar-a-Lago summit",src:"Bloomberg",bias:1,mag:1.7,cat:"deal"},
-  {text:"JUST IN: Phase 2 China deal includes $500B in purchases over 3 years",src:"CNBC",bias:1,mag:2.2,cat:"deal"},
-  {text:"Trump: 'We've reached a deal. Tariffs coming OFF. Markets will love this!'",src:"Press Conference",bias:1,mag:2.0,cat:"deal"},
-  {text:"Trump calls Fed Chair 'totally clueless' — demands emergency rate cut NOW",src:"Truth Social",bias:-1,mag:1.5,cat:"fed"},
-  {text:"Trump: 'I may fire the Fed Chair. I have the right to do it!'",src:"Fox News Interview",bias:-1,mag:2.0,cat:"fed"},
-  {text:"BREAKING: Trump signs EO attempting to restructure Federal Reserve oversight",src:"Bloomberg",bias:-1,mag:2.3,cat:"fed"},
-  {text:"Trump: 'Interest rates should be ZERO. The Fed is destroying our country!'",src:"Truth Social",bias:-1,mag:1.3,cat:"fed"},
-  {text:"White House exploring legal options to remove Fed Chair, sources say",src:"Washington Post",bias:-1,mag:1.8,cat:"fed"},
-  {text:"Trump demands negative interest rates: 'Europe does it, we should too!'",src:"Press Gaggle",bias:-1,mag:1.4,cat:"fed"},
-  {text:"Trump: 'Stock market at ALL-TIME HIGHS! You're welcome, America!'",src:"Truth Social",bias:1,mag:0.8,cat:"cheer"},
-  {text:"Trump takes credit for market rally: 'My policies are working BEAUTIFULLY'",src:"Rally Speech",bias:1,mag:0.6,cat:"cheer"},
-  {text:"Trump: 'The Dow is going to 50,000 very soon. Believe me!'",src:"Truth Social",bias:1,mag:0.5,cat:"cheer"},
-  {text:"Trump: 'Best economy in the HISTORY of the world. Not even close!'",src:"Press Conference",bias:1,mag:0.7,cat:"cheer"},
-  {text:"Trump threatens to withdraw from NATO within 30 days unless allies pay up",src:"Reuters",bias:-1,mag:2.0,cat:"geo"},
-  {text:"BREAKING: Trump orders carrier strike group to South China Sea amid tensions",src:"AP News",bias:-1,mag:1.8,cat:"geo"},
-  {text:"Trump: 'All options on the table' regarding Iran — military not ruled out",src:"White House",bias:-1,mag:1.7,cat:"geo"},
-  {text:"Trump imposes sweeping sanctions on multiple countries in surprise announcement",src:"Treasury Dept",bias:-1,mag:1.5,cat:"geo"},
-  {text:"Trump threatens to 'totally destroy' trade relations with non-compliant nations",src:"UN Address",bias:-1,mag:1.9,cat:"geo"},
-  {text:"JUST IN: Trump pulls US out of major international trade organization",src:"Bloomberg",bias:-1,mag:2.1,cat:"geo"},
-  {text:"Trump REVERSES tariff decision from earlier today: 'Actually, we'll hold off'",src:"White House Pool",bias:1,mag:1.8,cat:"reversal"},
-  {text:"UPDATE: Trump backs down on China threat — 'We're talking again, very productive'",src:"Reuters",bias:1,mag:1.6,cat:"reversal"},
-  {text:"Trump flip-flops on trade deal: 'The deal is OFF... unless they agree to my terms'",src:"Truth Social",bias:-1,mag:1.5,cat:"reversal"},
-  {text:"BREAKING: Executive order from this morning already being revised, officials say",src:"CNN",bias:1,mag:1.3,cat:"reversal"},
-  {text:"Trump reverses course on sanctions after phone call with foreign leader",src:"State Dept",bias:1,mag:1.4,cat:"reversal"},
-  {text:"3AM TRUTH POST: 'THE MARKET WILL CRASH IF DEMOCRATS WIN. ONLY I CAN SAVE IT!'",src:"Truth Social",bias:-0.5,mag:1.0,cat:"rant"},
-  {text:"Trump midnight post: 'Big announcement coming tomorrow. HUGE. Stay tuned!'",src:"Truth Social",bias:0.5,mag:1.2,cat:"rant"},
-  {text:"Trump: 'The FAKE NEWS is trying to crash the market. Don't let them!'",src:"Truth Social",bias:0.3,mag:0.8,cat:"rant"},
-  {text:"Late night Truth Social storm: 12 posts in 30 minutes about market manipulation",src:"Truth Social",bias:-0.7,mag:1.3,cat:"rant"},
-  {text:"Trump: 'Something VERY BIG is happening. Can't say what yet. Markets will be VERY happy!'",src:"Truth Social",bias:0.8,mag:1.1,cat:"rant"},
-  {text:"Trump posts then deletes cryptic message about 'major economic policy shift'",src:"Truth Social",bias:-0.6,mag:1.5,cat:"rant"},
-  {text:"BREAKING: Massive $2 trillion infrastructure deal reached with bipartisan support",src:"Congressional Leaders",bias:1,mag:2.3,cat:"surprise"},
-  {text:"Trump announces largest tax cut in history — corporate rate slashed to 15%",src:"White House",bias:1,mag:2.5,cat:"surprise"},
-  {text:"JUST IN: Trump administration to deregulate major sectors, stocks surge",src:"Bloomberg",bias:1,mag:1.8,cat:"surprise"},
-  {text:"Trump: 'Biggest tech deal ever — $500B investment in American AI'",src:"Press Conference",bias:1,mag:2.0,cat:"surprise"},
-  {text:"Surprise debt ceiling deal reached — government shutdown averted",src:"Reuters",bias:1,mag:1.5,cat:"surprise"},
-  {text:"Trump threatens 'scorched earth' on trade — markets interpret as negotiating tactic",src:"CNBC Analysis",bias:1,mag:1.2,cat:"fakeout",fakeout:true},
-  {text:"Trump says 'market is going to crash' — shorts pile in then get squeezed",src:"Truth Social",bias:1,mag:1.8,cat:"fakeout",fakeout:true},
-  {text:"Trump announces 'incredible deal' — details reveal minimal actual changes",src:"Reuters Analysis",bias:-1,mag:1.0,cat:"fakeout",fakeout:true},
-  {text:"Trade war fears spike on Trump rhetoric — algos buy the dip aggressively",src:"Market Data",bias:1,mag:1.5,cat:"fakeout",fakeout:true},
-  {text:"Trump: 'Tariffs DOUBLED!' — fine print shows they apply to obscure $2M product category",src:"AP Fact Check",bias:1,mag:1.3,cat:"fakeout",fakeout:true},
-  {text:"Trump victory lap on deal — analysts note deal already priced in, profit-taking ensues",src:"Goldman Research",bias:-1,mag:1.2,cat:"fakeout",fakeout:true},
-  {text:"PANIC: Trump 'nuclear option' on trade — turns out to be strongly worded letter",src:"White House Source",bias:1,mag:1.4,cat:"fakeout",fakeout:true},
-  {text:"Trump tweets 'SELL EVERYTHING' at 2am — market rallies 1% at open on short squeeze",src:"Truth Social",bias:1,mag:2.0,cat:"fakeout",fakeout:true},
-  {text:"Trump accidentally tweets partial draft of trade proposal — then deletes it",src:"Truth Social",bias:-1,mag:1.6,cat:"chaos"},
-  {text:"Conflicting statements from Trump and Treasury Secretary on tariff policy",src:"Reuters",bias:-1,mag:1.3,cat:"chaos"},
-  {text:"Trump: 'I love tariffs. Tariffs are the greatest thing ever invented!'",src:"Rally Speech",bias:-0.8,mag:1.0,cat:"chaos"},
-  {text:"Trump press secretary: 'The president was being sarcastic about crashing the market'",src:"White House Briefing",bias:0.5,mag:0.9,cat:"chaos"},
-  {text:"Trump to CEOs at dinner: 'Buckle up, big changes coming this week'",src:"Pool Report",bias:-0.6,mag:1.2,cat:"chaos"},
+  {text:"Reciprocal tariffs on 15 additional countries confirmed for next week",src:"WSJ",bias:-1,mag:1.9,cat:"tariff"},
+  {text:"BREAKING: Trump announces 'magnificent' trade deal with China",src:"White House",bias:1,mag:2.5,cat:"deal"},
+  {text:"Trump: 'Beautiful deal with Japan, biggest in history!'",src:"Truth Social",bias:1,mag:1.8,cat:"deal"},
+  {text:"US and EU reach trade framework — tariff pause extended 90 days",src:"Reuters",bias:1,mag:2.0,cat:"deal"},
+  {text:"Surprise trade agreement with India at Mar-a-Lago summit",src:"Bloomberg",bias:1,mag:1.7,cat:"deal"},
+  {text:"Phase 2 China deal includes $500B in purchases over 3 years",src:"CNBC",bias:1,mag:2.2,cat:"deal"},
+  {text:"Trump: 'Tariffs coming OFF. Markets will love this!'",src:"Press Conference",bias:1,mag:2.0,cat:"deal"},
+  {text:"Trump calls Fed Chair 'totally clueless' — demands rate cut NOW",src:"Truth Social",bias:-1,mag:1.5,cat:"fed"},
+  {text:"Trump: 'I may fire the Fed Chair. I have the right!'",src:"Fox News",bias:-1,mag:2.0,cat:"fed"},
+  {text:"Trump signs EO to restructure Federal Reserve oversight",src:"Bloomberg",bias:-1,mag:2.3,cat:"fed"},
+  {text:"Trump: 'Interest rates should be ZERO!'",src:"Truth Social",bias:-1,mag:1.3,cat:"fed"},
+  {text:"Trump: 'Stock market at ALL-TIME HIGHS! You're welcome!'",src:"Truth Social",bias:1,mag:0.8,cat:"cheer"},
+  {text:"Trump: 'Best economy in the HISTORY of the world!'",src:"Press Conference",bias:1,mag:0.7,cat:"cheer"},
+  {text:"Trump threatens to withdraw from NATO within 30 days",src:"Reuters",bias:-1,mag:2.0,cat:"geo"},
+  {text:"Trump orders carrier strike group to South China Sea",src:"AP News",bias:-1,mag:1.8,cat:"geo"},
+  {text:"Trump: 'All options on the table' regarding Iran",src:"White House",bias:-1,mag:1.7,cat:"geo"},
+  {text:"Trump pulls US out of major international trade organization",src:"Bloomberg",bias:-1,mag:2.1,cat:"geo"},
+  {text:"3AM TRUTH POST: 'THE MARKET WILL CRASH IF DEMS WIN!'",src:"Truth Social",bias:-0.5,mag:1.0,cat:"rant"},
+  {text:"Trump: 'Something VERY BIG happening. Markets will be HAPPY!'",src:"Truth Social",bias:0.8,mag:1.1,cat:"rant"},
+  {text:"Trump posts then deletes cryptic 'major economic policy shift'",src:"Truth Social",bias:-0.6,mag:1.5,cat:"rant"},
+  {text:"BREAKING: Massive $2 trillion infrastructure deal reached",src:"Congress",bias:1,mag:2.3,cat:"surprise"},
+  {text:"Trump announces largest tax cut in history — corporate rate 15%",src:"White House",bias:1,mag:2.5,cat:"surprise"},
+  {text:"Trump: '$500B investment in American AI — biggest tech deal ever'",src:"Press Conference",bias:1,mag:2.0,cat:"surprise"},
+  {text:"Trump 'scorched earth' on trade — markets see negotiating tactic",src:"CNBC",bias:1,mag:1.2,cat:"fakeout",fakeout:true},
+  {text:"Trump says 'market will crash' — shorts get squeezed hard",src:"Truth Social",bias:1,mag:1.8,cat:"fakeout",fakeout:true},
+  {text:"Trump 'incredible deal' — details reveal minimal changes",src:"Reuters",bias:-1,mag:1.0,cat:"fakeout",fakeout:true},
+  {text:"Trump tweets 'SELL EVERYTHING' — market rallies on squeeze",src:"Truth Social",bias:1,mag:2.0,cat:"fakeout",fakeout:true},
+  {text:"Trump accidentally tweets draft trade proposal — deletes it",src:"Truth Social",bias:-1,mag:1.6,cat:"chaos"},
+  {text:"Conflicting statements from Trump and Treasury on tariffs",src:"Reuters",bias:-1,mag:1.3,cat:"chaos"},
+  {text:"Trump to CEOs: 'Buckle up, big changes coming this week'",src:"Pool Report",bias:-0.6,mag:1.2,cat:"chaos"},
 ];
 
-// ============== AUDIO ==============
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function initAudio(){if(!audioCtx)audioCtx=new AudioCtx();if('speechSynthesis' in window)speechSynthesis.getVoices()}
+// ═══════ WHIPSAW PAIRS ═══════
+const WHIPSAWS = [
+  {first:{text:"BREAKING: 50% tariffs on ALL imports — effective immediately!",src:"White House",bias:-1,mag:2.5},
+   reversal:{text:"UPDATE: Trump reverses — tariffs 'delayed indefinitely'",src:"White House Pool",bias:1,mag:2.8}},
+  {first:{text:"Trump: 'Trade deal with China is DEAD. Totally dead!'",src:"Truth Social",bias:-1,mag:2.2},
+   reversal:{text:"UPDATE: Trump and Xi on phone — 'Very productive call, deal back on'",src:"Reuters",bias:1,mag:2.5}},
+  {first:{text:"BREAKING: Trump fires Fed Chair via executive order",src:"Bloomberg",bias:-1,mag:2.8},
+   reversal:{text:"UPDATE: White House walks it back — 'The president was expressing frustration'",src:"Press Secretary",bias:1,mag:2.5}},
+  {first:{text:"Trump announces 'largest military action in decades'",src:"AP News",bias:-1,mag:2.3},
+   reversal:{text:"UPDATE: 'Military action' is a trade enforcement measure, not combat",src:"Pentagon",bias:1,mag:2.0}},
+  {first:{text:"Trump: 'We have reached a BEAUTIFUL deal!' Markets surge",src:"Press Conference",bias:1,mag:2.3},
+   reversal:{text:"UPDATE: Deal collapses within hours — both sides walk away",src:"Reuters",bias:-1,mag:2.6}},
+  {first:{text:"EMERGENCY: Trump threatens to shut down all trade with China",src:"White House",bias:-1,mag:2.6},
+   reversal:{text:"UPDATE: 'Just negotiating tactics' says senior advisor",src:"CNN",bias:1,mag:2.2}},
+];
+
+// ═══════ ACHIEVEMENTS ═══════
+const ACHIEVEMENT_DEFS = [
+  {id:'diamond_hands',name:'Diamond Hands',icon:'💎',desc:'Held through $5K+ drawdown and profited'},
+  {id:'paper_hands',name:'Paper Hands',icon:'🧻',desc:'Flattened 5+ times in one game'},
+  {id:'whipsawed',name:'Whipsawed',icon:'🌪️',desc:'Got caught on wrong side of a reversal'},
+  {id:'perfect_read',name:'Perfect Read',icon:'🎯',desc:'100% win rate with 3+ trades'},
+  {id:'speed_demon',name:'Speed Demon',icon:'⚡',desc:'Made 10+ trades in 30 seconds'},
+  {id:'got_trumped',name:'Got Trumped',icon:'💀',desc:'Margin called'},
+  {id:'survivor',name:'Survivor',icon:'🛡️',desc:'Finished without getting margin called'},
+  {id:'big_baller',name:'Big Baller',icon:'🤑',desc:'Ended with $20K+ profit'},
+  {id:'hot_streak',name:'Hot Streak',icon:'🔥',desc:'Hit a 5+ win streak'},
+  {id:'headline_surfer',name:'Headline Surfer',icon:'🏄',desc:'Profited from 3+ headlines in a row'},
+];
+
+function loadAchievements(){return JSON.parse(localStorage.getItem('trumptape_achievements')||'{}');}
+function saveAchievements(a){localStorage.setItem('trumptape_achievements',JSON.stringify(a));}
+function unlockAchievement(id){
+  const all=loadAchievements();
+  if(all[id])return false;
+  all[id]=Date.now();
+  saveAchievements(all);
+  const def=ACHIEVEMENT_DEFS.find(d=>d.id===id);
+  if(def)showAchievementToast(def);
+  return true;
+}
+function showAchievementToast(def){
+  const container=document.getElementById('achievement-toasts');
+  const t=document.createElement('div');
+  t.className='achievement-toast';
+  t.innerHTML=`<span class="toast-icon">${def.icon}</span><div class="toast-text"><div class="toast-name">${def.name}</div>${def.desc}</div>`;
+  container.appendChild(t);
+  playChaChing();
+  setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300)},3000);
+}
+
+// ═══════ AUDIO ═══════
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let audioCtx,ambientNode;
+function initAudio(){
+  if(!audioCtx)audioCtx=new AudioCtx();
+  if('speechSynthesis' in window)speechSynthesis.getVoices();
+}
 function playTone(freq,dur,type='sine',vol=0.15){
   if(!audioCtx)return;
   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
@@ -376,167 +401,182 @@ function playTone(freq,dur,type='sine',vol=0.15){
   o.start();g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
   o.stop(audioCtx.currentTime+dur);
 }
-function playAlert(){playTone(880,.08,'square',.12);setTimeout(()=>playTone(1100,.08,'square',.12),100);setTimeout(()=>playTone(1400,.12,'square',.12),200)}
-function playCelebration(){
-  if(!audioCtx)return;
-  const t=audioCtx.currentTime;
-  // Triumphant fanfare — ascending major chord brass hits
+function makeNoise(dur){
+  const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*dur,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const src=audioCtx.createBufferSource();src.buffer=buf;return src;
+}
+function playCrowdGasp(){
+  if(!audioCtx)return;const t=audioCtx.currentTime;
+  // Layered descending voices
+  [220,185,150,260,200,170].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
+    o.type='sawtooth';o.frequency.setValueAtTime(f+Math.random()*30,t);
+    o.frequency.linearRampToValueAtTime(f*0.6,t+0.5);
+    flt.type='bandpass';flt.frequency.value=700+Math.random()*500;flt.Q.value=2.5;
+    g.gain.setValueAtTime(0,t+i*0.015);
+    g.gain.linearRampToValueAtTime(0.05,t+i*0.015+0.04);
+    g.gain.setValueAtTime(0.04,t+0.25);g.gain.linearRampToValueAtTime(0,t+0.55);
+    o.connect(flt);flt.connect(g);g.connect(audioCtx.destination);
+    o.start(t+i*0.015);o.stop(t+0.6);
+  });
+  // Noise layer for crowd texture
+  for(let i=0;i<4;i++){
+    const n=makeNoise(0.5),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
+    flt.type='bandpass';flt.frequency.value=1200+Math.random()*800;flt.Q.value=2;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.03,t+0.05);g.gain.linearRampToValueAtTime(0,t+0.5);
+    n.connect(flt);flt.connect(g);g.connect(audioCtx.destination);n.start(t);
+  }
+}
+function playCrowdCheer(){
+  if(!audioCtx)return;const t=audioCtx.currentTime;
+  // Rising voices
+  [300,350,400,320,380,420].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
+    o.type='sawtooth';o.frequency.setValueAtTime(f,t);
+    o.frequency.linearRampToValueAtTime(f*1.4,t+0.4);
+    flt.type='bandpass';flt.frequency.value=1200+Math.random()*800;flt.Q.value=2;
+    g.gain.setValueAtTime(0,t+i*0.01);g.gain.linearRampToValueAtTime(0.04,t+0.06);
+    g.gain.setValueAtTime(0.04,t+0.3);g.gain.linearRampToValueAtTime(0,t+0.55);
+    o.connect(flt);flt.connect(g);g.connect(audioCtx.destination);
+    o.start(t+i*0.01);o.stop(t+0.6);
+  });
+  // Bright noise
+  for(let i=0;i<5;i++){
+    const n=makeNoise(0.5),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
+    flt.type='bandpass';flt.frequency.value=2000+Math.random()*1500;flt.Q.value=1.5;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.035,t+0.04);g.gain.linearRampToValueAtTime(0,t+0.5);
+    n.connect(flt);flt.connect(g);g.connect(audioCtx.destination);n.start(t);
+  }
+  // Fanfare
   [523,659,784,1047].forEach((f,i)=>{
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type='sawtooth';o.frequency.value=f;
-    g.gain.setValueAtTime(0,t+i*0.1);
-    g.gain.linearRampToValueAtTime(0.08,t+i*0.1+0.03);
-    g.gain.setValueAtTime(0.08,t+i*0.1+0.15);
-    g.gain.linearRampToValueAtTime(0,t+i*0.1+0.4);
-    o.connect(g);g.connect(audioCtx.destination);
-    o.start(t+i*0.1);o.stop(t+i*0.1+0.45);
+    g.gain.setValueAtTime(0,t+i*0.08);g.gain.linearRampToValueAtTime(0.06,t+i*0.08+0.03);
+    g.gain.linearRampToValueAtTime(0,t+i*0.08+0.35);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t+i*0.08);o.stop(t+i*0.08+0.4);
   });
-  // Crowd cheer — layered noise bursts with bandpass
-  setTimeout(()=>{
-    const t2=audioCtx.currentTime;
-    for(let i=0;i<6;i++){
-      const buf=audioCtx.createBufferSource(),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
-      const noise=audioCtx.createBuffer(1,audioCtx.sampleRate*0.6,audioCtx.sampleRate);
-      const d=noise.getChannelData(0);
-      for(let j=0;j<d.length;j++)d[j]=(Math.random()*2-1);
-      buf.buffer=noise;
-      flt.type='bandpass';flt.frequency.value=1500+Math.random()*2000;flt.Q.value=1.5;
-      g.gain.setValueAtTime(0,t2);
-      g.gain.linearRampToValueAtTime(0.04,t2+0.05);
-      g.gain.setValueAtTime(0.04,t2+0.3);
-      g.gain.linearRampToValueAtTime(0,t2+0.6);
-      buf.connect(flt);flt.connect(g);g.connect(audioCtx.destination);
-      buf.start(t2+i*0.02);
-    }
-  },350);
-  // Speech: "let's go!"
-  setTimeout(()=>{
-    if('speechSynthesis' in window){
-      const u=new SpeechSynthesisUtterance("let's go!");
-      u.rate=1.3;u.pitch=1.4;u.volume=0.8;
-      speechSynthesis.speak(u);
-    }
-  },200);
 }
-function playOhNo(){
+function playRecordScratch(){
+  if(!audioCtx)return;const t=audioCtx.currentTime;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type='sawtooth';o.frequency.setValueAtTime(2000,t);o.frequency.linearRampToValueAtTime(80,t+0.15);
+  g.gain.setValueAtTime(0.15,t);g.gain.linearRampToValueAtTime(0,t+0.2);
+  o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+0.25);
+}
+function playChaChing(){
   if(!audioCtx)return;
-  // Synthesize a crowd "oh no" with layered descending voices
-  const t=audioCtx.currentTime;
-  // Multiple voices saying "oh" (descending pitches = dismay)
-  [220,185,150,260,200].forEach((f,i)=>{
-    const o=audioCtx.createOscillator(),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
-    o.type='sawtooth';o.frequency.setValueAtTime(f+Math.random()*30,t);
-    o.frequency.linearRampToValueAtTime(f*0.7,t+0.35);
-    flt.type='bandpass';flt.frequency.value=800+Math.random()*400;flt.Q.value=2;
-    g.gain.setValueAtTime(0,t+i*0.02);
-    g.gain.linearRampToValueAtTime(0.06,t+i*0.02+0.05);
-    g.gain.setValueAtTime(0.06,t+0.2);
-    g.gain.linearRampToValueAtTime(0,t+0.5);
-    o.connect(flt);flt.connect(g);g.connect(audioCtx.destination);
-    o.start(t+i*0.02);o.stop(t+0.55);
-  });
-  // "No" part — nasal vowel shift
-  setTimeout(()=>{
-    const t2=audioCtx.currentTime;
-    [180,150,120,210,165].forEach((f,i)=>{
-      const o=audioCtx.createOscillator(),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
-      o.type='sawtooth';o.frequency.setValueAtTime(f+Math.random()*20,t2);
-      o.frequency.linearRampToValueAtTime(f*0.6,t2+0.4);
-      flt.type='bandpass';flt.frequency.value=600+Math.random()*300;flt.Q.value=3;
-      g.gain.setValueAtTime(0,t2+i*0.015);
-      g.gain.linearRampToValueAtTime(0.07,t2+i*0.015+0.04);
-      g.gain.linearRampToValueAtTime(0.05,t2+0.25);
-      g.gain.linearRampToValueAtTime(0,t2+0.5);
-      o.connect(flt);flt.connect(g);g.connect(audioCtx.destination);
-      o.start(t2+i*0.015);o.stop(t2+0.55);
-    });
-  },300);
-  // Also say it with speech synthesis for clarity
-  setTimeout(()=>{
-    if('speechSynthesis' in window){
-      const u=new SpeechSynthesisUtterance("oh no");
-      u.rate=1.2;u.pitch=1.3;u.volume=0.8;
-      speechSynthesis.speak(u);
-    }
-  },100);
+  playTone(1200,.06,'sine',.08);setTimeout(()=>playTone(1600,.06,'sine',.08),60);setTimeout(()=>playTone(2000,.1,'sine',.08),120);
 }
-function playWin(){playTone(523,.1,'sine',.1);setTimeout(()=>playTone(659,.1,'sine',.1),100);setTimeout(()=>playTone(784,.15,'sine',.1),200)}
-function playLoss(){playTone(300,.15,'sawtooth',.1);setTimeout(()=>playTone(200,.2,'sawtooth',.1),150)}
+function playWin(){playTone(523,.1,'sine',.08);setTimeout(()=>playTone(659,.1,'sine',.08),80);setTimeout(()=>playTone(784,.12,'sine',.08),160)}
+function playLoss(){playTone(300,.15,'sawtooth',.08);setTimeout(()=>playTone(200,.2,'sawtooth',.08),120)}
 function playBoom(){playTone(80,.5,'sawtooth',.2);playTone(60,.6,'square',.15)}
-function playTick(){playTone(1000,.02,'sine',.05)}
+function playTick(){playTone(1000,.02,'sine',.04)}
 function playFired(){
-  playTone(200,.3,'sawtooth',.2);
-  setTimeout(()=>playTone(150,.3,'sawtooth',.2),200);
-  setTimeout(()=>playTone(100,.5,'sawtooth',.25),400);
-  setTimeout(()=>{
-    if('speechSynthesis' in window){
-      const u=new SpeechSynthesisUtterance("You're fired!");
-      u.rate=0.8;u.pitch=0.7;u.volume=1;
-      const voices=speechSynthesis.getVoices();
-      const male=voices.find(v=>/male|david|james|mark|daniel/i.test(v.name));
-      if(male)u.voice=male;
-      speechSynthesis.speak(u);
-    }
-  },800);
+  playBoom();
+  setTimeout(()=>{if('speechSynthesis' in window){
+    const u=new SpeechSynthesisUtterance("You're fired!");
+    u.rate=0.8;u.pitch=0.7;u.volume=1;
+    const voices=speechSynthesis.getVoices();
+    const male=voices.find(v=>/male|david|james|mark|daniel/i.test(v.name));
+    if(male)u.voice=male;speechSynthesis.speak(u);
+  }},600);
 }
+function startAmbient(){
+  if(!audioCtx||ambientNode)return;
+  const n=makeNoise(4),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
+  flt.type='bandpass';flt.frequency.value=400;flt.Q.value=0.5;
+  g.gain.value=0.008;n.loop=true;
+  n.connect(flt);flt.connect(g);g.connect(audioCtx.destination);n.start();ambientNode={src:n,gain:g};
+}
+function stopAmbient(){if(ambientNode){ambientNode.src.stop();ambientNode=null;}}
 
-// ============== GAME STATE ==============
-let state = null;
-const GAME_DURATION = 30*1000;
-const TICK_MS = 50;
-const CANDLE_MS = 800;
-const CONTRACT_VALUE = 50;
-const START_CAPITAL = 50000;
-const START_PRICE = 5500;
-const MAX_CONTRACTS = 5;
+// ═══════ GAME STATE ═══════
+let state=null;
+const GAME_DURATION=30*1000,CANDLE_MS=800,CONTRACT_VALUE=50,START_CAPITAL=50000,START_PRICE=5500,MAX_CONTRACTS=5;
 
 function freshState(){
-  return {
-    running:false,startTime:0,elapsed:0,price:START_PRICE,
-    priceHistory:[],candles:[],currentCandle:null,candleStart:0,
-    position:0,avgEntry:0,capital:START_CAPITAL,realizedPnl:0,
-    trades:0,wins:0,losses:0,streak:0,bestStreak:0,tradeLog:[],
-    lastHeadlineTime:0,headlineInterval:6000,difficulty:0,
-    usedHeadlines:new Set(),activeShock:null,shockRemaining:0,tickerItems:[],
-  };
+  return{running:false,startTime:0,elapsed:0,price:START_PRICE,priceHistory:[],candles:[],currentCandle:null,candleStart:0,
+    position:0,avgEntry:0,capital:START_CAPITAL,realizedPnl:0,trades:0,wins:0,losses:0,streak:0,bestStreak:0,
+    tradeLog:[],lastHeadlineTime:0,headlineInterval:6000,difficulty:0,usedHeadlines:new Set(),
+    activeShock:null,shockRemaining:0,tickerItems:[],flatCount:0,maxDrawdown:0,peakPnl:0,
+    headlinesSurvived:0,consecutiveHeadlineProfits:0,bestHeadlineProfitStreak:0,
+    whipsawPending:null,whipsawTimer:0,newsCountdown:0,newsCountdownActive:false,isFakeout:false,
+    chartRipples:[],chartFlashY:null,chartFlashAlpha:0,sessionNewAchievements:[],
+    wasInDrawdown:false,drawdownRecovered:false};
 }
 
-// ============== PRICE ENGINE ==============
+// ═══════ PRICE ENGINE ═══════
 function tickPrice(dt){
-  const s=state, dtSec=dt/1000;
-  let vol=0.12+s.difficulty*0.04, drift=0;
+  const s=state,dtSec=dt/1000;
+  let vol=0.12+s.difficulty*0.04,drift=0;
   if(s.activeShock&&s.shockRemaining>0){
-    const shockVol=s.activeShock.mag*1.2, shockDir=s.activeShock.bias;
-    drift=shockDir*shockVol*3*dtSec;
-    vol+=shockVol*0.2;
-    s.shockRemaining-=dt;
-    if(s.shockRemaining<=0)s.activeShock=null;
+    const sv=s.activeShock.mag*1.2,sd=s.activeShock.bias;
+    drift=sd*sv*3*dtSec;vol+=sv*0.2;
+    s.shockRemaining-=dt;if(s.shockRemaining<=0)s.activeShock=null;
   }
-  const randNorm=(Math.random()+Math.random()+Math.random()-1.5)*1.63;
-  const move=drift+s.price*vol*Math.sqrt(dtSec/252/6.5/3600)*randNorm*10;
-  s.price=Math.max(s.price+move,100);
+  const rn=(Math.random()+Math.random()+Math.random()-1.5)*1.63;
+  s.price=Math.max(s.price+drift+s.price*vol*Math.sqrt(dtSec/252/6.5/3600)*rn*10,100);
   s.priceHistory.push({t:s.elapsed,p:s.price});
   if(s.priceHistory.length>3000)s.priceHistory.shift();
   if(!s.currentCandle||s.elapsed-s.candleStart>=CANDLE_MS){
     if(s.currentCandle)s.candles.push(s.currentCandle);
     s.currentCandle={o:s.price,h:s.price,l:s.price,c:s.price,t:s.elapsed};
-    s.candleStart=s.elapsed;
-    if(s.candles.length>120)s.candles.shift();
-  }else{
-    const c=s.currentCandle;c.c=s.price;c.h=Math.max(c.h,s.price);c.l=Math.min(c.l,s.price);
+    s.candleStart=s.elapsed;if(s.candles.length>150)s.candles.shift();
+  }else{const c=s.currentCandle;c.c=s.price;c.h=Math.max(c.h,s.price);c.l=Math.min(c.l,s.price);}
+}
+
+// ═══════ NEWS COUNTDOWN ═══════
+function startNewsCountdown(){
+  const s=state;
+  s.newsCountdownActive=true;
+  s.newsCountdown=5;
+  s.isFakeout=Math.random()<0.25; // 25% fake-out
+  document.getElementById('news-countdown').style.display='block';
+}
+function tickNewsCountdown(dt){
+  const s=state;if(!s.newsCountdownActive)return;
+  s.newsCountdown-=dt/1000;
+  const num=Math.max(1,Math.ceil(s.newsCountdown));
+  document.getElementById('nc-num').textContent=num;
+  document.getElementById('news-countdown').style.animationDuration=(0.3+num*0.1)+'s';
+  if(s.newsCountdown<=0){
+    s.newsCountdownActive=false;
+    document.getElementById('news-countdown').style.display='none';
+    if(s.isFakeout){
+      // Small vol spike on fake-out
+      s.activeShock={bias:(Math.random()>0.5?1:-1)*0.3,mag:0.5};
+      s.shockRemaining=800;
+    }else{
+      // Decide: whipsaw or normal?
+      if(Math.random()<0.3&&s.elapsed>5000) triggerWhipsaw();
+      else triggerHeadline();
+    }
   }
 }
 
-// ============== HEADLINE ENGINE ==============
+// ═══════ HEADLINE ENGINE ═══════
 function triggerHeadline(){
   const s=state;
   let available=HEADLINES.filter((_,i)=>!s.usedHeadlines.has(i));
   if(!available.length){s.usedHeadlines.clear();available=HEADLINES;}
   const idx=HEADLINES.indexOf(available[Math.floor(Math.random()*available.length)]);
   s.usedHeadlines.add(idx);
-  const h=HEADLINES[idx];
+  showHeadline(HEADLINES[idx],false);
+}
+function triggerWhipsaw(){
+  const ws=WHIPSAWS[Math.floor(Math.random()*WHIPSAWS.length)];
+  showHeadline(ws.first,false);
+  state.whipsawPending=ws.reversal;
+  state.whipsawTimer=3000+Math.random()*2000;
+  // Track if player is on wrong side for achievement
+  state._whipsawDir=ws.first.bias;
+}
+function showHeadline(h,isReversal){
+  const s=state;
   s.activeShock={bias:h.bias,mag:h.mag*(1+s.difficulty*0.3)};
   s.shockRemaining=2000+h.mag*1500;
+  s.headlinesSurvived++;
   const flash=document.getElementById('headline-flash');
   document.getElementById('headline-text').textContent=h.text;
   document.getElementById('headline-source').textContent='— '+h.src;
@@ -544,34 +584,44 @@ function triggerHeadline(){
   impact.textContent=h.bias>0?'▲ ES SURGING':'▼ ES DROPPING';
   impact.className='impact '+(h.bias>0?'up':'down');
   flash.className=h.bias>0?'bullish':'';
-  flash.querySelector('.flash-label').textContent=h.bias>0?'MARKET ALERT':'BREAKING NEWS';
-  flash.style.display='block';
-  flash.style.animation='none';
-  flash.offsetHeight;
-  flash.style.animation='slideDown .25s ease';
+  const label=flash.querySelector('.flash-label');
+  label.textContent=isReversal?'⚡ UPDATE':h.bias>0?'MARKET ALERT':'BREAKING NEWS';
+  flash.style.display='block';flash.style.animation='none';flash.offsetHeight;flash.style.animation='slideDown .25s ease';
+  // Screen effects
   document.body.classList.add(h.bias>0?'screen-flash-green':'screen-flash-red');
-  document.getElementById('chart-wrap').classList.add('shake');
-  setTimeout(()=>{document.body.classList.remove('screen-flash-green','screen-flash-red');document.getElementById('chart-wrap').classList.remove('shake')},400);
-  s.tickerItems.push(h.text);
-  updateTicker();
-  setTimeout(()=>{flash.style.display='none'},4000+h.mag*1000);
-  if(h.bias>0){playCelebration()}else{playOhNo()}
+  const cw=document.getElementById('chart-wrap');
+  cw.classList.add(s.difficulty>2?'shake-hard':'shake');
+  cw.classList.add('glitch');
+  setTimeout(()=>{document.body.classList.remove('screen-flash-green','screen-flash-red');cw.classList.remove('shake','shake-hard','glitch')},400);
+  // Chart ripple + flash
+  s.chartRipples.push({x:0.9,y:0.5,r:0,alpha:1,t:0});
+  s.chartFlashAlpha=0.6;
+  // Audio
+  if(isReversal){playRecordScratch();setTimeout(()=>h.bias>0?playCrowdCheer():playCrowdGasp(),200);}
+  else{h.bias>0?playCrowdCheer():playCrowdGasp();}
+  // Streak >= 3 cha-ching
+  if(s.streak>=3)setTimeout(()=>playChaChing(),300);
+  s.tickerItems.push(h.text);updateTicker();
+  setTimeout(()=>{flash.style.display='none'},3500+h.mag*800);
   s.headlineInterval=Math.max(3000,6000-s.difficulty*800);
   s.lastHeadlineTime=s.elapsed;
+  // Achievement: headline surfer
+  const unr=s.position?(s.price-s.avgEntry)*s.position*CONTRACT_VALUE:0;
+  if(unr>0){s.consecutiveHeadlineProfits++;if(s.consecutiveHeadlineProfits>s.bestHeadlineProfitStreak)s.bestHeadlineProfitStreak=s.consecutiveHeadlineProfits;}
+  else{s.consecutiveHeadlineProfits=0;}
+  if(s.bestHeadlineProfitStreak>=3)unlockAchievement('headline_surfer');
 }
 function updateTicker(){
-  const el=document.getElementById('ticker-content');
-  const items=state.tickerItems.slice(-10);
+  const el=document.getElementById('ticker-content'),items=state.tickerItems.slice(-10);
   el.innerHTML=items.map(t=>`<span>${t}</span>`).join('')+items.map(t=>`<span>${t}</span>`).join('');
 }
 
-// ============== TRADING ==============
+// ═══════ TRADING ═══════
 function trade(side,size){
   if(!state||!state.running)return;
   const s=state;
-  if(side==='flat'){if(s.position===0)return;closeTrade();return;}
-  const dir=side==='long'?1:-1;
-  const newPos=s.position+dir*size;
+  if(side==='flat'){if(s.position===0)return;closeTrade();s.flatCount++;return;}
+  const dir=side==='long'?1:-1,newPos=s.position+dir*size;
   if(Math.abs(newPos)>MAX_CONTRACTS)return;
   if(s.position!==0&&newPos===0){closeTrade();return;}
   if(s.position!==0&&Math.sign(newPos)!==Math.sign(s.position)){
@@ -585,81 +635,108 @@ function closeTrade(){
   const s=state;if(s.position===0)return;
   const pnl=(s.price-s.avgEntry)*s.position*CONTRACT_VALUE;
   s.realizedPnl+=pnl;s.capital+=pnl;
-  if(pnl>0){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;playWin()}
-  else if(pnl<0){s.losses++;s.streak=0;playLoss()}
+  if(pnl>0){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;playWin();}
+  else if(pnl<0){s.losses++;s.streak=0;playLoss();
+    // Check whipsaw achievement
+    if(s._whipsawDir&&((s._whipsawDir>0&&s.position>0)||(s._whipsawDir<0&&s.position<0))){
+      // Player was on the side of the first headline, got hurt by reversal
+    }
+    if(s.whipsawPending)unlockAchievement('whipsawed');
+  }
   logTrade(`CLOSE ${Math.abs(s.position)} @ ${s.price.toFixed(2)} → ${pnl>=0?'+':''}$${pnl.toFixed(0)}`,pnl);
   s.position=0;s.avgEntry=0;updateUI();
+  if(s.streak>=5)unlockAchievement('hot_streak');
 }
 function logTrade(msg,pnl){
   const s=state,el=document.getElementById('trade-log'),d=document.createElement('div');
   d.className='entry'+(pnl!==undefined?(pnl>=0?' win':' loss'):'');
   const mins=Math.floor(s.elapsed/60000),secs=Math.floor((s.elapsed%60000)/1000);
   d.textContent=`${mins}:${String(secs).padStart(2,'0')} ${msg}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;s.tradeLog.push({msg,pnl:pnl||0});
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
 }
 
-// ============== CHART ==============
+// ═══════ CHART ═══════
 function drawChart(){
   const canvas=document.getElementById('chart'),wrap=document.getElementById('chart-wrap');
-  const W=wrap.clientWidth,H=wrap.clientHeight;
-  canvas.width=W;canvas.height=H;
+  const W=wrap.clientWidth,H=wrap.clientHeight;canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d');
-  // Background gradient
   const bg=ctx.createLinearGradient(0,0,0,H);
   bg.addColorStop(0,'#0a0e16');bg.addColorStop(1,'#060810');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
   const s=state;if(!s)return;
-  const candles=[...s.candles];
-  if(s.currentCandle)candles.push(s.currentCandle);
+  const candles=[...s.candles];if(s.currentCandle)candles.push(s.currentCandle);
   if(candles.length<2)return;
-  const maxCandles=Math.floor(W/10);
-  const visible=candles.slice(-maxCandles);
+  const maxC=Math.floor(W/10),visible=candles.slice(-maxC);
   let minP=Infinity,maxP=-Infinity;
-  for(const c of visible){minP=Math.min(minP,c.l);maxP=Math.max(maxP,c.h)}
+  for(const c of visible){minP=Math.min(minP,c.l);maxP=Math.max(maxP,c.h);}
   const pad=(maxP-minP)*0.1||10;minP-=pad;maxP+=pad;
-  const candleW=Math.max(4,W/visible.length-2),gap=W/visible.length;
+  const cW=Math.max(4,W/visible.length-2),gap=W/visible.length;
   // Grid
   ctx.strokeStyle='rgba(28,40,64,.5)';ctx.lineWidth=1;
-  const gridStep=Math.pow(10,Math.floor(Math.log10(maxP-minP)));
-  const step=gridStep>20?gridStep/4:gridStep;
-  ctx.font='10px "JetBrains Mono"';ctx.fillStyle='rgba(90,101,128,.6)';
+  const gs=Math.pow(10,Math.floor(Math.log10(maxP-minP))),step=gs>20?gs/4:gs;
+  ctx.font='10px "JetBrains Mono"';ctx.fillStyle='rgba(90,101,128,.5)';
   for(let p=Math.floor(minP/step)*step;p<=maxP;p+=step){
     const y=H-(p-minP)/(maxP-minP)*H;
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-    ctx.fillText(p.toFixed(0),6,y-3);
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillText(p.toFixed(0),6,y-3);
   }
-  // Candles
+  // Volume bars + candles
+  let maxVol=0;
+  for(const c of visible)maxVol=Math.max(maxVol,Math.abs(c.c-c.o));
   for(let i=0;i<visible.length;i++){
     const c=visible[i],x=i*gap+gap/2;
     const yO=H-(c.o-minP)/(maxP-minP)*H,yC=H-(c.c-minP)/(maxP-minP)*H;
     const yH=H-(c.h-minP)/(maxP-minP)*H,yL=H-(c.l-minP)/(maxP-minP)*H;
-    const bull=c.c>=c.o;
-    // Glow effect on recent candles
-    const recency=i/visible.length;
-    const alpha=0.3+recency*0.7;
+    const bull=c.c>=c.o,recency=i/visible.length,alpha=0.3+recency*0.7;
+    // Volume bar at bottom
+    if(maxVol>0){
+      const volH=Math.abs(c.c-c.o)/maxVol*30;
+      ctx.fillStyle=bull?'rgba(46,196,134,'+(alpha*0.3)+')':'rgba(230,57,70,'+(alpha*0.3)+')';
+      ctx.fillRect(x-cW/2,H-volH,cW,volH);
+    }
     ctx.globalAlpha=alpha;
-    ctx.strokeStyle=bull?'#2ec486':'#e63946';
-    ctx.fillStyle=bull?'rgba(46,196,134,.8)':'rgba(230,57,70,.8)';
+    ctx.strokeStyle=bull?'#2ec486':'#e63946';ctx.fillStyle=bull?'rgba(46,196,134,.8)':'rgba(230,57,70,.8)';
     ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
-    const bodyTop=Math.min(yO,yC),bodyH=Math.max(Math.abs(yC-yO),1);
-    ctx.fillRect(x-candleW/2,bodyTop,candleW,bodyH);
-    ctx.globalAlpha=1;
+    const bTop=Math.min(yO,yC),bH=Math.max(Math.abs(yC-yO),1);
+    ctx.fillRect(x-cW/2,bTop,cW,bH);ctx.globalAlpha=1;
   }
   // Entry line
   if(s.position!==0){
-    const yEntry=H-(s.avgEntry-minP)/(maxP-minP)*H;
+    const yE=H-(s.avgEntry-minP)/(maxP-minP)*H;
     ctx.strokeStyle=s.position>0?'rgba(46,196,134,.4)':'rgba(230,57,70,.4)';
-    ctx.setLineDash([6,4]);ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(0,yEntry);ctx.lineTo(W,yEntry);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle=s.position>0?'var(--green)':'var(--red)';
-    ctx.font='bold 11px "JetBrains Mono"';
+    ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(0,yE);ctx.lineTo(W,yE);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle=s.position>0?'#2ec486':'#e63946';
-    ctx.fillText('ENTRY '+s.avgEntry.toFixed(2),W-130,yEntry-5);
+    ctx.font='bold 11px "JetBrains Mono"';ctx.fillText('ENTRY '+s.avgEntry.toFixed(2),W-130,yE-5);
+  }
+  // Impact flash line
+  if(s.chartFlashAlpha>0){
+    ctx.strokeStyle='rgba(255,255,255,'+s.chartFlashAlpha+')';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.lineWidth=1;
+    s.chartFlashAlpha-=0.03;
+  }
+  // Ripples
+  for(let i=s.chartRipples.length-1;i>=0;i--){
+    const rp=s.chartRipples[i];rp.r+=3;rp.alpha-=0.025;
+    if(rp.alpha<=0){s.chartRipples.splice(i,1);continue;}
+    ctx.strokeStyle='rgba(255,255,255,'+rp.alpha+')';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(rp.x*W,rp.y*H,rp.r,0,Math.PI*2);ctx.stroke();
   }
 }
 
-// ============== UI ==============
+// ═══════ SCREEN EFFECTS ═══════
+function updateScreenEffects(){
+  const s=state;if(!s)return;
+  const unr=s.position?(s.price-s.avgEntry)*s.position*CONTRACT_VALUE:0;
+  const total=s.realizedPnl+unr;
+  // Vignette color based on P&L
+  const vig=document.getElementById('vignette');
+  if(total>2000) vig.style.boxShadow='inset 0 0 150px rgba(46,196,134,.15)';
+  else if(total<-2000) vig.style.boxShadow='inset 0 0 150px rgba(230,57,70,.2)';
+  else vig.style.boxShadow='inset 0 0 150px rgba(0,0,0,.6)';
+  // Scanline intensity
+  document.getElementById('scanlines').style.opacity=0.5+s.difficulty*0.15;
+}
+
+// ═══════ UI ═══════
 function updateUI(){
   const s=state;if(!s)return;
   const ch=s.price-START_PRICE,pct=ch/START_PRICE*100;
@@ -668,56 +745,72 @@ function updateUI(){
   pcd.textContent=`${ch>=0?'+':''}${ch.toFixed(2)} (${pct>=0?'+':''}${pct.toFixed(2)}%)`;
   pcd.style.color=ch>=0?'var(--green)':'var(--red)';
   const pd=document.getElementById('position-display');
-  if(s.position>0){pd.textContent=`LONG ${s.position}`;pd.className='long'}
-  else if(s.position<0){pd.textContent=`SHORT ${Math.abs(s.position)}`;pd.className='short'}
-  else{pd.textContent='FLAT';pd.className='flat'}
+  if(s.position>0){pd.textContent=`LONG ${s.position}`;pd.className='long';}
+  else if(s.position<0){pd.textContent=`SHORT ${Math.abs(s.position)}`;pd.className='short';}
+  else{pd.textContent='FLAT';pd.className='flat';}
   document.getElementById('contracts').textContent=Math.abs(s.position);
   document.getElementById('avg-entry').textContent=s.position?s.avgEntry.toFixed(2):'—';
-  const unrealized=s.position?(s.price-s.avgEntry)*s.position*CONTRACT_VALUE:0;
-  const total=s.realizedPnl+unrealized;
-  setVal('unrealized',unrealized);setVal('realized',s.realizedPnl);
-  setVal('total-pnl',total);setVal('capital',s.capital+unrealized);
+  const unr=s.position?(s.price-s.avgEntry)*s.position*CONTRACT_VALUE:0;
+  const total=s.realizedPnl+unr;
+  setVal('unrealized',unr);setVal('realized',s.realizedPnl);setVal('total-pnl',total);setVal('capital',s.capital+unr);
   document.getElementById('trade-count').textContent=s.trades;
   document.getElementById('win-rate').textContent=(s.wins+s.losses)>0?Math.round(s.wins/(s.wins+s.losses)*100)+'%':'—';
   const sd=document.getElementById('streak-display');sd.textContent=s.streak;
   sd.className=s.streak>=3?'hot':'';
   document.getElementById('streak-bonus').textContent=(1+Math.min(s.streak,10)*0.1).toFixed(1)+'x MULTIPLIER';
-  const remaining=Math.max(0,GAME_DURATION-s.elapsed);
-  document.getElementById('time-label').textContent=`${Math.floor(remaining/60000)}:${String(Math.floor((remaining%60000)/1000)).padStart(2,'0')}`;
-  const diffNames=['EASY','MEDIUM','HARD','INSANE','NIGHTMARE'];
-  const di=Math.min(4,Math.floor(s.difficulty));
-  document.getElementById('difficulty-label').textContent='DIFFICULTY: '+diffNames[di]+' '+'★'.repeat(di+1);
+  const rem=Math.max(0,GAME_DURATION-s.elapsed);
+  document.getElementById('time-label').textContent=`${Math.floor(rem/60000)}:${String(Math.floor((rem%60000)/1000)).padStart(2,'0')}`;
+  const dn=['EASY','MEDIUM','HARD','INSANE','NIGHTMARE'],di=Math.min(4,Math.floor(s.difficulty));
+  document.getElementById('difficulty-label').textContent='DIFFICULTY: '+dn[di]+' '+'★'.repeat(di+1);
+  // Track drawdown for achievements
+  if(total>s.peakPnl)s.peakPnl=total;
+  const dd=s.peakPnl-total;if(dd>s.maxDrawdown)s.maxDrawdown=dd;
+  if(dd>=5000)s.wasInDrawdown=true;
+  if(s.wasInDrawdown&&total>0)s.drawdownRecovered=true;
 }
 function setVal(id,val){
   const el=document.getElementById(id),abs=Math.abs(val);
   const fmt=abs>=100?abs.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','):abs.toFixed(2);
-  el.textContent=(val>=0?'+':'-')+'$'+fmt;
-  el.className='value '+(val>=0?'positive':'negative');
+  el.textContent=(val>=0?'+':'-')+'$'+fmt;el.className='value '+(val>=0?'positive':'negative');
 }
 
-// ============== GAME LOOP ==============
+// ═══════ GAME LOOP ═══════
 let lastTime=0;
 function gameLoop(ts){
   if(!state||!state.running)return;
   const dt=Math.min(ts-lastTime,100);lastTime=ts;state.elapsed+=dt;
   state.difficulty=Math.min(4.5,state.elapsed/GAME_DURATION*4.5);
   tickPrice(dt);
-  if(state.elapsed-state.lastHeadlineTime>state.headlineInterval)triggerHeadline();
-  const unrealized=state.position?(state.price-state.avgEntry)*state.position*CONTRACT_VALUE:0;
-  if(state.capital+unrealized<=0){gameOver(false);return}
-  if(state.elapsed>=GAME_DURATION){if(state.position!==0)closeTrade();gameOver(true);return}
-  updateUI();drawChart();requestAnimationFrame(gameLoop);
+  // Whipsaw timer
+  if(state.whipsawPending){
+    state.whipsawTimer-=dt;
+    if(state.whipsawTimer<=0){
+      showHeadline(state.whipsawPending,true);
+      state.whipsawPending=null;state._whipsawDir=0;
+    }
+  }
+  // News countdown
+  if(state.newsCountdownActive){tickNewsCountdown(dt);}
+  else if(state.elapsed-state.lastHeadlineTime>state.headlineInterval&&!state.whipsawPending){
+    startNewsCountdown();
+  }
+  const unr=state.position?(state.price-state.avgEntry)*state.position*CONTRACT_VALUE:0;
+  if(state.capital+unr<=0){gameOver(false);return;}
+  if(state.elapsed>=GAME_DURATION){if(state.position!==0)closeTrade();gameOver(true);return;}
+  updateUI();updateScreenEffects();drawChart();requestAnimationFrame(gameLoop);
 }
 
-// ============== GAME FLOW ==============
+// ═══════ GAME FLOW ═══════
 function startGame(){
   initAudio();state=freshState();
   document.getElementById('start-screen').style.display='none';
   document.getElementById('game-over-screen').style.display='none';
   document.getElementById('headline-flash').style.display='none';
+  document.getElementById('news-countdown').style.display='none';
   document.getElementById('trade-log').innerHTML='<h3>Trade Log</h3>';
+  document.getElementById('achievement-toasts').innerHTML='';
   state.tickerItems=['MARKETS OPEN — ES FUTURES TRADING LIVE','TRUMP PRESS CONFERENCE SCHEDULED FOR TODAY'];
-  updateTicker();
+  updateTicker();startAmbient();
   const cd=document.getElementById('countdown');cd.style.display='block';
   const hype='<span class="hype">Get ready to trade, Hedgooor!</span>';
   cd.innerHTML=hype+'3';cd.style.animation='countPop .5s ease';playTone(440,.2);
@@ -725,15 +818,22 @@ function startGame(){
   setTimeout(()=>{cd.innerHTML=hype+'1';cd.style.animation='none';cd.offsetHeight;cd.style.animation='countPop .5s ease';playTone(440,.2)},2000);
   setTimeout(()=>{
     cd.innerHTML='TRADE';cd.style.color='var(--green)';cd.style.animation='none';cd.offsetHeight;cd.style.animation='countPop .5s ease';
-    playTone(880,.3);
-    setTimeout(()=>{cd.style.display='none';cd.style.color='var(--gold)'},600);
+    playTone(880,.3);setTimeout(()=>{cd.style.display='none';cd.style.color='var(--gold)'},600);
     state.running=true;state.startTime=performance.now();lastTime=performance.now();
     requestAnimationFrame(gameLoop);
   },3000);
 }
 function gameOver(survived){
-  state.running=false;
+  state.running=false;stopAmbient();
   const total=state.realizedPnl+(state.position?(state.price-state.avgEntry)*state.position*CONTRACT_VALUE:0);
+  // Check achievements
+  if(!survived)unlockAchievement('got_trumped');
+  if(survived)unlockAchievement('survivor');
+  if(total>=20000)unlockAchievement('big_baller');
+  if(state.wins>0&&state.losses===0&&state.trades>=3)unlockAchievement('perfect_read');
+  if(state.trades>=10)unlockAchievement('speed_demon');
+  if(state.flatCount>=5)unlockAchievement('paper_hands');
+  if(state.drawdownRecovered)unlockAchievement('diamond_hands');
   if(!survived){
     const ex=document.getElementById('explosion');ex.className='active';ex.style.display='block';
     playFired();setTimeout(()=>{ex.className='';ex.style.display='none'},1200);
@@ -743,8 +843,9 @@ function gameOver(survived){
   else if(total>=0)grade='C';else if(total>=-15000)grade='D';else grade='F';
   const scores=JSON.parse(localStorage.getItem('trumptape_scores')||'[]');
   scores.push({pnl:total,grade,date:new Date().toISOString().slice(0,10),survived});
-  scores.sort((a,b)=>b.pnl-a.pnl);
-  localStorage.setItem('trumptape_scores',JSON.stringify(scores.slice(0,10)));
+  scores.sort((a,b)=>b.pnl-a.pnl);localStorage.setItem('trumptape_scores',JSON.stringify(scores.slice(0,10)));
+  // Store final stats for share card
+  state._finalStats={total,grade,survived,trades:state.trades,winRate:(state.wins+state.losses)>0?Math.round(state.wins/(state.wins+state.losses)*100):0,bestStreak:state.bestStreak,headlines:state.headlinesSurvived};
   setTimeout(()=>{
     const screen=document.getElementById('game-over-screen');
     screen.className='overlay'+(survived&&total>=0?' win':'');
@@ -752,19 +853,72 @@ function gameOver(survived){
     const pnlEl=document.getElementById('go-pnl');
     pnlEl.textContent=(total>=0?'+':'-')+'$'+Math.abs(total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
     pnlEl.className='big '+(total>=0?'positive':'negative');
-    const gradeEl=document.getElementById('go-grade');gradeEl.textContent=grade;gradeEl.className='grade '+grade;
-    let lb='<table>';
-    scores.slice(0,5).forEach((s,i)=>{
+    document.getElementById('go-grade').textContent=grade;
+    document.getElementById('go-grade').className='grade '+grade;
+    // Leaderboard
+    let lb='<table>';scores.slice(0,5).forEach((s,i)=>{
       const c=s.pnl>=0?'var(--green)':'var(--red)';
       lb+=`<tr><td style="color:var(--text-muted)">#${i+1}</td><td style="color:${c}">${s.pnl>=0?'+':''}$${s.pnl.toFixed(0)}</td><td>${s.grade}</td><td style="color:var(--text-muted)">${s.date}</td></tr>`;
     });lb+='</table>';
     document.getElementById('leaderboard').innerHTML='<div class="lb-title">High Scores</div>'+lb;
+    // Show achievements
+    const allAch=loadAchievements();
+    const achHtml=ACHIEVEMENT_DEFS.filter(d=>allAch[d.id]).map(d=>
+      `<div class="ach-badge${allAch[d.id]>Date.now()-60000?' new':''}"><span class="ach-icon">${d.icon}</span>${d.name}</div>`
+    ).join('');
+    document.getElementById('go-achievements').innerHTML=achHtml;
     screen.style.display='flex';
   },survived?500:1200);
 }
 
-// ============== KEYBOARD ==============
-document.addEventListener('keydown',(e)=>{
+// ═══════ SHARE CARD ═══════
+function downloadScoreCard(){
+  const fs=state._finalStats;if(!fs)return;
+  const c=document.getElementById('share-card'),ctx=c.getContext('2d');
+  // Background
+  const bg=ctx.createLinearGradient(0,0,0,400);
+  bg.addColorStop(0,'#0a0e16');bg.addColorStop(1,'#060810');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,600,400);
+  // Border
+  ctx.strokeStyle=fs.total>=0?'#2ec486':'#e63946';ctx.lineWidth=3;ctx.strokeRect(2,2,596,396);
+  // Title
+  ctx.font='bold 36px "Bebas Neue",sans-serif';ctx.fillStyle='#d4a843';ctx.textAlign='center';
+  ctx.fillText('TRADING THE TRUMP TAPE',300,50);
+  // Grade
+  ctx.font='bold 90px "Bebas Neue",sans-serif';
+  ctx.fillStyle=fs.grade==='S'?'#d4a843':fs.grade==='A'?'#2ec486':fs.grade==='B'?'#4a9eff':fs.grade==='F'?'#ff1a2e':'#e63946';
+  ctx.fillText(fs.grade,300,155);
+  // P&L
+  ctx.font='bold 42px "Bebas Neue",sans-serif';
+  ctx.fillStyle=fs.total>=0?'#2ec486':'#e63946';
+  ctx.fillText((fs.total>=0?'+':'-')+'$'+Math.abs(fs.total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','),300,210);
+  // Stats
+  ctx.font='16px "Oswald",sans-serif';ctx.fillStyle='#5a6580';
+  const stats=[`${fs.trades} Trades`,`${fs.winRate}% Win Rate`,`${fs.bestStreak} Best Streak`,`${fs.headlines} Headlines Survived`];
+  ctx.fillText(stats.join('  ·  '),300,250);
+  // Result
+  ctx.font='20px "Oswald",sans-serif';ctx.fillStyle=fs.survived?'#2ec486':'#e63946';
+  ctx.fillText(fs.survived?'SURVIVED THE TAPE':'GOT TRUMPED',300,290);
+  // Footer
+  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle='#3a4560';
+  ctx.fillText('trump-tape-trader.onrender.com',300,370);
+  // Download
+  c.toBlob(blob=>{
+    if(navigator.share&&navigator.canShare){
+      const file=new File([blob],'trump-tape-score.png',{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'Trading the Trump Tape',text:`I scored ${fs.total>=0?'+':''}$${fs.total.toFixed(0)} (Grade: ${fs.grade}) trading the Trump tape! Can you beat me?`});
+        return;
+      }
+    }
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='trump-tape-score.png';a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+// ═══════ KEYBOARD ═══════
+document.addEventListener('keydown',e=>{
   if(!state||!state.running)return;
   switch(e.key){
     case '1':trade('long',1);break;case '2':trade('long',3);break;
@@ -773,7 +927,6 @@ document.addEventListener('keydown',(e)=>{
   }
 });
 
-// ============== INIT ==============
 drawChart();
 </script>
 </body>
