@@ -484,12 +484,77 @@ function playFired(){
 }
 function startAmbient(){
   if(!audioCtx||ambientNode)return;
-  const n=makeNoise(4),g=audioCtx.createGain(),flt=audioCtx.createBiquadFilter();
-  flt.type='bandpass';flt.frequency.value=400;flt.Q.value=0.5;
-  g.gain.value=0.008;n.loop=true;
-  n.connect(flt);flt.connect(g);g.connect(audioCtx.destination);n.start();ambientNode={src:n,gain:g};
+  const master=audioCtx.createGain();master.gain.value=0.12;master.connect(audioCtx.destination);
+  const nodes=[];
+  // 1) Deep pulsing bass drone — heartbeat of stress
+  const bass=audioCtx.createOscillator(),bassG=audioCtx.createGain(),bassF=audioCtx.createBiquadFilter();
+  bass.type='sawtooth';bass.frequency.value=55;
+  bassF.type='lowpass';bassF.frequency.value=120;bassF.Q.value=4;
+  // LFO to pulse the bass
+  const lfo=audioCtx.createOscillator(),lfoG=audioCtx.createGain();
+  lfo.type='sine';lfo.frequency.value=1.8; // heartbeat speed
+  lfoG.gain.value=0.15;
+  lfo.connect(lfoG);lfoG.connect(bassG.gain);
+  bassG.gain.value=0.25;
+  bass.connect(bassF);bassF.connect(bassG);bassG.connect(master);
+  bass.start();lfo.start();
+  nodes.push(bass,lfo);
+  // 2) Ticking clock — urgency
+  const tickBuf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.02,audioCtx.sampleRate);
+  const td=tickBuf.getChannelData(0);
+  for(let i=0;i<td.length;i++)td[i]=Math.exp(-i/100)*(Math.random()*2-1);
+  let tickInterval=setInterval(()=>{
+    if(!audioCtx||audioCtx.state==='closed')return;
+    const src=audioCtx.createBufferSource(),g=audioCtx.createGain(),f=audioCtx.createBiquadFilter();
+    src.buffer=tickBuf;f.type='highpass';f.frequency.value=2000;
+    g.gain.value=0.3;
+    src.connect(f);f.connect(g);g.connect(master);src.start();
+  },500);
+  // 3) Ominous mid-range drone — tension
+  const drone1=audioCtx.createOscillator(),drone2=audioCtx.createOscillator();
+  const droneG=audioCtx.createGain(),droneF=audioCtx.createBiquadFilter();
+  drone1.type='sine';drone1.frequency.value=110;
+  drone2.type='sine';drone2.frequency.value=111.5; // slight detune = unease
+  droneF.type='bandpass';droneF.frequency.value=200;droneF.Q.value=1;
+  droneG.gain.value=0.15;
+  drone1.connect(droneF);drone2.connect(droneF);droneF.connect(droneG);droneG.connect(master);
+  drone1.start();drone2.start();
+  nodes.push(drone1,drone2);
+  // 4) High tension string — dissonant shimmer
+  const str1=audioCtx.createOscillator(),str2=audioCtx.createOscillator();
+  const strG=audioCtx.createGain(),strF=audioCtx.createBiquadFilter();
+  str1.type='sine';str1.frequency.value=330;
+  str2.type='sine';str2.frequency.value=349; // minor 2nd = maximum tension
+  strF.type='bandpass';strF.frequency.value=400;strF.Q.value=2;
+  strG.gain.value=0.04;
+  str1.connect(strF);str2.connect(strF);strF.connect(strG);strG.connect(master);
+  str1.start();str2.start();
+  nodes.push(str1,str2);
+  // 5) Filtered noise bed — crowd/static atmosphere
+  const noise=makeNoise(4),noiseG=audioCtx.createGain(),noiseF=audioCtx.createBiquadFilter();
+  noiseF.type='bandpass';noiseF.frequency.value=500;noiseF.Q.value=0.3;
+  noiseG.gain.value=0.08;noise.loop=true;
+  noise.connect(noiseF);noiseF.connect(noiseG);noiseG.connect(master);noise.start();
+  nodes.push(noise);
+  ambientNode={nodes,master,tickInterval,
+    // Intensity ramp: call this from game loop
+    setIntensity(t){
+      // t: 0-1 (start to end of game)
+      master.gain.value=0.10+t*0.10;
+      lfo.frequency.value=1.8+t*1.5; // heartbeat speeds up
+      bassG.gain.value=0.25+t*0.15;
+      strG.gain.value=0.04+t*0.06; // dissonance grows
+      droneG.gain.value=0.15+t*0.1;
+    }
+  };
 }
-function stopAmbient(){if(ambientNode){ambientNode.src.stop();ambientNode=null;}}
+function stopAmbient(){
+  if(!ambientNode)return;
+  ambientNode.nodes.forEach(n=>{try{n.stop()}catch(e){}});
+  clearInterval(ambientNode.tickInterval);
+  try{ambientNode.master.disconnect()}catch(e){}
+  ambientNode=null;
+}
 
 // ═══════ GAME STATE ═══════
 let state=null;
@@ -797,7 +862,9 @@ function gameLoop(ts){
   const unr=state.position?(state.price-state.avgEntry)*state.position*CONTRACT_VALUE:0;
   if(state.capital+unr<=0){gameOver(false);return;}
   if(state.elapsed>=GAME_DURATION){if(state.position!==0)closeTrade();gameOver(true);return;}
-  updateUI();updateScreenEffects();drawChart();requestAnimationFrame(gameLoop);
+  updateUI();updateScreenEffects();drawChart();
+  if(ambientNode&&ambientNode.setIntensity)ambientNode.setIntensity(state.elapsed/GAME_DURATION);
+  requestAnimationFrame(gameLoop);
 }
 
 // ═══════ GAME FLOW ═══════
